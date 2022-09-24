@@ -5,7 +5,7 @@ fn main() {
 }
 
 pub struct KVStore {
-    map: HashMap<String, String>,
+    map: HashMap<Vec<u8>, Vec<u8>>,
 }
 
 trait KVService {
@@ -23,15 +23,15 @@ impl KVService for KVStore {
     }
 
     fn put(&mut self, key: Vec<u8>, value: Vec<u8>) {
-        self.map.insert(String::from_utf8(key).unwrap(), String::from_utf8(value).unwrap());
+        self.map.insert(key, value);
     }
 
     fn get(&self, key: Vec<u8>) -> Option<Vec<u8>> {
-        self.map.get(&String::from_utf8(key).unwrap()).map(|v| v.as_bytes().to_vec())
+        self.map.get(&key).map(|v| v.clone())
     }
 
     fn delete(&mut self, key: Vec<u8>) {
-        self.map.remove(&String::from_utf8(key).unwrap());
+        self.map.remove(&key);
     }
 }
 
@@ -42,22 +42,23 @@ mod tests {
     #[test]
     fn test_put() {
         let mut store = KVStore::new();
-        store.put("key".as_bytes().to_vec(), "value".as_bytes().to_vec());
-        assert_eq!(store.get("key".as_bytes().to_vec()), Some("value".as_bytes().to_vec()));
+        store.put(b"key".to_vec(), b"value".to_vec());
+        assert_eq!(store.get(b"key".to_vec()), Some(b"value".to_vec()));
     }
 
     #[test]
     fn test_get() {
         let mut store = KVStore::new();
-        store.put("key".as_bytes().to_vec(), "value".as_bytes().to_vec());
-        assert_eq!(store.get("key".as_bytes().to_vec()), Some("value".as_bytes().to_vec()));
+        store.put(b"key".to_vec(), b"value".to_vec());
+        assert_eq!(store.get(b"key".to_vec()), Some(b"value".to_vec()));
+        assert_eq!(store.get(b"key2".to_vec()), None);
     }
 
     #[test]
     fn test_delete() {
         let mut store = KVStore::new();
-        store.put("key".as_bytes().to_vec(), "value".as_bytes().to_vec());
-        store.delete("key".as_bytes().to_vec());
-        assert_eq!(store.get("key".as_bytes().to_vec()), None);
+        store.put(b"key".to_vec(), b"value".to_vec());
+        store.delete(b"key".to_vec());
+        assert_eq!(store.get(b"key".to_vec()), None);
     }
 }
