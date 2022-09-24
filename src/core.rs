@@ -39,14 +39,14 @@ mod tests {
     fn test_put() {
         let mut store = KVStore::new();
         store.put(b"key", b"value");
-        assert_eq!(store.get(b"key"), Some(b"value"));
+        assert_eq!(store.get(b"key"), Some(b"value".as_slice()));
     }
 
     #[test]
     fn test_get() {
         let mut store = KVStore::new();
         store.put(b"key", b"value");
-        assert_eq!(store.get(b"key"), Some(b"value"));
+        assert_eq!(store.get(b"key"), Some(b"value".as_slice()));
     }
 
     #[test]
